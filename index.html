@@ -39,7 +39,7 @@
         // Initialize WebSocket connection
         function connect() {
             // Using a public WebSocket echo server for testing
-            ws = new WebSocket('ws://echo.websocket.org');
+            ws = new WebSocket('wss://echo.websocket.org');
 
             ws.onopen = function() {
                 log('Connected to WebSocket server');
