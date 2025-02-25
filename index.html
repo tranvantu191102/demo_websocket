@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+    <style>
+        #output {
+            width: 500px;
+            height: 200px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        #message {
+            width: 400px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h2>WebSocket Test Client</h2>
+    <input type="text" id="message" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+    <button onclick="closeConnection()">Close Connection</button>
+    <div id="output"></div>
+
+    <script>
+        let ws;
+        const output = document.getElementById('output');
+
+        // Function to add messages to output
+        function log(message) {
+            const div = document.createElement('div');
+            div.textContent = message;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Initialize WebSocket connection
+        function connect() {
+            // Using a public WebSocket echo server for testing
+            ws = new WebSocket('wss://echo.websocket.org');
+
+            ws.onopen = function() {
+                log('Connected to WebSocket server');
+            };
+
+            ws.onmessage = function(event) {
+                log('Received: ' + event.data);
+            };
+
+            ws.onerror = function(error) {
+                log('Error: ' + error);
+            };
+
+            ws.onclose = function() {
+                log('Connection closed');
+            };
+        }
+
+        // Send message function
+        function sendMessage() {
+            const input = document.getElementById('message');
+            const message = input.value;
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(message);
+                log('Sent: ' + message);
+                input.value = '';
+            } else {
+                log('Not connected. Please wait for connection.');
+            }
+        }
+
+        // Close connection function
+        function closeConnection() {
+            if (ws) {
+                ws.close();
+            }
+        }
+
+        // Connect when page loads
+        window.onload = connect;
+
+        // Handle Enter key press
+        document.getElementById('message').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
