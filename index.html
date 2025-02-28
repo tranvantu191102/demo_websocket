@@ -2,9 +2,7 @@
 <html>
 <head>
     <title>Automated Test Runner</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://smtpjs.com/v3/smtp.js"></script>
+
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <style>
         body {
@@ -126,6 +124,11 @@
         <button class="button" onclick="sendReport()">Send</button>
         <button class="button" onclick="closeEmailPopup()">Cancel</button>
     </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
     <script>
         let testCases = [
             { name: "Test Case 1", description: "Checks WebSocket wss:// support", run: runTestCase1 },
@@ -135,17 +138,17 @@
         function runTestCase1() {
             return new Promise(resolve => {
                 let ws = new WebSocket('wss://echo.websocket.org');
-                ws.onopen = () => { ws.close(); resolve("Passed"); };
-                ws.onerror = () => resolve("Failed");
-                setTimeout(() => resolve("Failed"), 10000);
+                let timeout = setTimeout(() => { ws.close(); resolve("Failed"); }, 10000);
+                ws.onopen = () => { clearTimeout(timeout); ws.close(); resolve("Passed"); };
+                ws.onerror = () => { clearTimeout(timeout); resolve("Failed"); };
             });
         }
         function runTestCase2() {
             return new Promise(resolve => {
                 let ws = new WebSocket('ws://echo.websocket.org');
-                ws.onopen = () => { ws.close(); resolve("Passed"); };
-                ws.onerror = () => resolve("Failed");
-                setTimeout(() => resolve("Failed"), 10000);
+                let timeout = setTimeout(() => { ws.close(); resolve("Failed"); }, 10000);
+                ws.onopen = () => { clearTimeout(timeout); ws.close(); resolve("Passed"); };
+                ws.onerror = () => { clearTimeout(timeout); resolve("Failed"); };
             });
         }
         function runTests() {
