@@ -1,92 +1,183 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>WebSocket Test</title>
+    <title>Test Runner</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://smtpjs.com/v3/smtp.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <style>
-        #output {
-            width: 500px;
-            height: 200px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            overflow-y: auto;
-            margin-top: 10px;
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
         }
-        #message {
-            width: 400px;
+        .status {
+            padding: 10px;
             margin: 10px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .running {
+            background-color: yellow;
+        }
+        /* .running img {
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            animation: spin 1s linear infinite;
+            background-color: yellow;
+        } */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .passed { background-color: lightgreen; }
+        .failed { background-color: lightcoral; }
+        table {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th { background-color: #333; color: white; }
+        .button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .button:disabled {
+            background-color: grey;
+            cursor: not-allowed;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            width: 300px;
+        }
+        .popup input {
+            padding: 8px;
+            width: 100%;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <h2>WebSocket Test Client</h2>
-    <input type="text" id="message" placeholder="Type a message...">
-    <button onclick="sendMessage()">Send</button>
-    <button onclick="closeConnection()">Close Connection</button>
-    <div id="output"></div>
-
+    <h2>Automated Test Runner</h2>
+    <div id="test-status" class="status running">Running tests...
+        <!-- <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f504.svg" alt="loading"> -->
+    </div>
+    <button class="button" id="rerunButton" onclick="rerunTests()" disabled>Re-run Tests</button>
+    <button class="button" id="sendReportButton" onclick="openEmailPopup()" disabled>Send Report</button>
+    <table id="reportTable">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Test Case Name</th>
+                <th>Description</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div id="emailPopup" class="popup">
+        <h3>Enter Receiver Email</h3>
+        <input type="email" id="receiverEmail" placeholder="Enter email">
+        <button class="button" onclick="sendReport()">Send</button>
+        <button class="button" onclick="closeEmailPopup()">Cancel</button>
+    </div>
     <script>
-        let ws;
-        const output = document.getElementById('output');
+        let testCases = [
+            { name: "Test Case 1", description: "Checks WebSocket wss:// support", run: runTestCase1 },
+            { name: "Test Case 2", description: "Checks WebSocket ws:// support", run: runTestCase2 }
+        ];
+        let results = [];
 
-        // Function to add messages to output
-        function log(message) {
-            const div = document.createElement('div');
-            div.textContent = message;
-            output.appendChild(div);
-            output.scrollTop = output.scrollHeight;
+        function runTestCase1() {
+            return new Promise(resolve => {
+                let ws = new WebSocket('wss://echo.websocket.org');
+                ws.onopen = () => { ws.close(); resolve("Passed"); };
+                ws.onerror = () => resolve("Failed");
+            });
         }
 
-        // Initialize WebSocket connection
-        function connect() {
-            // Using a public WebSocket echo server for testing
-            ws = new WebSocket('wss://echo.websocket.org');
-
-            ws.onopen = function() {
-                log('Connected to WebSocket server');
-            };
-
-            ws.onmessage = function(event) {
-                log('Received: ' + event.data);
-            };
-
-            ws.onerror = function(error) {
-                log('Error: ' + error);
-            };
-
-            ws.onclose = function() {
-                log('Connection closed');
-            };
+        function runTestCase2() {
+            return new Promise(resolve => {
+                let ws = new WebSocket('ws://echo.websocket.org');
+                ws.onopen = () => { ws.close(); resolve("Passed"); };
+                ws.onerror = () => resolve("Failed");
+            });
         }
 
-        // Send message function
-        function sendMessage() {
-            const input = document.getElementById('message');
-            const message = input.value;
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(message);
-                log('Sent: ' + message);
-                input.value = '';
-            } else {
-                log('Not connected. Please wait for connection.');
+        function runTests() {
+            results = [];
+            document.getElementById("rerunButton").disabled = true;
+            document.getElementById("sendReportButton").disabled = true;
+            $("#test-status").removeClass().addClass("status running").html('Running tests...');
+            $("#reportTable tbody").html("");
+            let index = 0;
+            function next() {
+                if (index < testCases.length) {
+                    let test = testCases[index];
+                    test.run().then(status => {
+                        results.push({ no: index + 1, name: test.name, description: test.description, status });
+                        updateTable();
+                        index++;
+                        next();
+                    });
+                } else {
+                    $("#test-status").removeClass("running").addClass("passed").text("All tests completed");
+                    document.getElementById("rerunButton").disabled = false;
+                    document.getElementById("sendReportButton").disabled = false;
+                }
             }
+            next();
         }
 
-        // Close connection function
-        function closeConnection() {
-            if (ws) {
-                ws.close();
-            }
+        function sendReport() {
+            let email = $("#receiverEmail").val();
+            let report = results.map(r => `${r.no}. ${r.name} - ${r.description} - ${r.status}`).join("\n");
+            Email.send({
+                SecureToken: "your-smtp-token-here",
+                To: email,
+                From: "your-email@example.com",
+                Subject: "Test Report",
+                Body: `Test Results:\n\n${report}`
+            }).then(message => alert("Report Sent Successfully"));
+            closeEmailPopup();
         }
 
-        // Connect when page loads
-        window.onload = connect;
-
-        // Handle Enter key press
-        document.getElementById('message').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
+        function rerunTests() { runTests(); }
+        function updateTable() {
+            let tbody = results.map(test => `<tr><td>${test.no}</td><td>${test.name}</td><td>${test.description}</td><td class="${test.status.toLowerCase()}">${test.status}</td></tr>`).join("");
+            $("#reportTable tbody").html(tbody);
+        }
+        function openEmailPopup() { $("#emailPopup").show(); }
+        function closeEmailPopup() { $("#emailPopup").hide(); }
+        $(document).ready(runTests);
     </script>
 </body>
 </html>
+
+
+
