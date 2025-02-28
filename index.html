@@ -158,8 +158,10 @@
             let index = 0;
             function next() {
                 if (index < testCases.length) {
+                    console.log("Running Test Case : ", testCases[index].name, '  Index:', index);
                     let test = testCases[index];
                     test.run().then(status => {
+                        console.log("Test Case : ", test.name, status);
                         results.push({ no: index + 1, name: test.name, description: test.description, status });
                         updateTable();
                         index++;
