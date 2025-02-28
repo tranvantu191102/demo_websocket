@@ -158,11 +158,16 @@
             let index = 0;
             function next() {
                 if (index < testCases.length) {
-                    window.prompt("Running Test Case : ", testCases[index].name, '  Index:', index);
+                    // window.prompt("Running Test Case : ", testCases[index].name, '  Index:', index);
                     let test = testCases[index];
                     test.run().then(status => {
-                        window.prompt("Test Case : ", test.name, status);
+                        // window.prompt("Test Case : ", test.name, status);
                         results.push({ no: index + 1, name: test.name, description: test.description, status });
+                        updateTable();
+                        index++;
+                        next();
+                    }).catch(error => {
+                        results.push({ no: index + 1, name: test.name, description: test.description, status: 'Failed' });
                         updateTable();
                         index++;
                         next();
