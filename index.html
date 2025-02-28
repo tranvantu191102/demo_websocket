@@ -137,6 +137,7 @@
                 let ws = new WebSocket('wss://echo.websocket.org');
                 ws.onopen = () => { ws.close(); resolve("Passed"); };
                 ws.onerror = () => resolve("Failed");
+                setTimeout(() => resolve("Failed"), 10000);
             });
         }
         function runTestCase2() {
@@ -144,6 +145,7 @@
                 let ws = new WebSocket('ws://echo.websocket.org');
                 ws.onopen = () => { ws.close(); resolve("Passed"); };
                 ws.onerror = () => resolve("Failed");
+                setTimeout(() => resolve("Failed"), 10000);
             });
         }
         function runTests() {
