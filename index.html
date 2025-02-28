@@ -1,64 +1,80 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Runner</title>
+    <title>Automated Test Runner</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://smtpjs.com/v3/smtp.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f4f4f4;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+            padding: 40px;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
         }
         .status {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
             display: flex;
+            justify-content: center;
             align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
         }
         .running {
-            background-color: yellow;
+            background-color: #fff4c4;
+            color: #d49a00;
         }
-        /* .running img {
-            width: 20px;
-            height: 20px;
+        .running img {
+            width: 22px;
+            height: 22px;
             margin-left: 10px;
             animation: spin 1s linear infinite;
-            background-color: yellow;
-        } */
+        }
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        .passed { background-color: lightgreen; }
-        .failed { background-color: lightcoral; }
+        .passed { background-color: #d4edda; color: #155724; }
+        .failed { background-color: #f8d7da; color: #721c24; }
         table {
-            margin-top: 20px;
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
+            padding: 12px;
+            text-align: center;
         }
-        th { background-color: #333; color: white; }
-        .button {
-            margin-top: 10px;
-            padding: 10px 15px;
+        th {
             background-color: #007bff;
             color: white;
+        }
+        .button {
+            margin: 15px 5px;
+            padding: 12px 18px;
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
         }
-        .button:hover {
-            background-color: #0056b3;
-        }
+        .button:hover { background-color: #218838; }
         .button:disabled {
             background-color: grey;
             cursor: not-allowed;
@@ -70,36 +86,40 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: white;
-            padding: 20px 40px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            width: 300px;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 350px;
         }
         .popup input {
-            padding: 8px;
+            padding: 10px;
             width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 6px;
             margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <h2>Automated Test Runner</h2>
-    <div id="test-status" class="status running">Running tests...
-        <!-- <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f504.svg" alt="loading"> -->
+    <div class="container">
+        <h2>Automated Test Runner</h2>
+        <div id="test-status" class="status running">Running tests...
+            <img src="Chasing-arrows.gif" alt="loading">
+        </div>
+        <button class="button" id="rerunButton" onclick="rerunTests()" disabled>Re-run Tests</button>
+        <button class="button" id="sendReportButton" onclick="openEmailPopup()" disabled>Send Report</button>
+        <table id="reportTable">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Test Case Name</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
-    <button class="button" id="rerunButton" onclick="rerunTests()" disabled>Re-run Tests</button>
-    <button class="button" id="sendReportButton" onclick="openEmailPopup()" disabled>Send Report</button>
-    <table id="reportTable">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Test Case Name</th>
-                <th>Description</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
     <div id="emailPopup" class="popup">
         <h3>Enter Receiver Email</h3>
         <input type="email" id="receiverEmail" placeholder="Enter email">
@@ -112,7 +132,6 @@
             { name: "Test Case 2", description: "Checks WebSocket ws:// support", run: runTestCase2 }
         ];
         let results = [];
-
         function runTestCase1() {
             return new Promise(resolve => {
                 let ws = new WebSocket('wss://echo.websocket.org');
@@ -120,7 +139,6 @@
                 ws.onerror = () => resolve("Failed");
             });
         }
-
         function runTestCase2() {
             return new Promise(resolve => {
                 let ws = new WebSocket('ws://echo.websocket.org');
@@ -128,12 +146,9 @@
                 ws.onerror = () => resolve("Failed");
             });
         }
-
         function runTests() {
             results = [];
-            document.getElementById("rerunButton").disabled = true;
-            document.getElementById("sendReportButton").disabled = true;
-            $("#test-status").removeClass().addClass("status running").html('Running tests...');
+            $("#test-status").removeClass().addClass("status running").html('Running tests...<img src="Chasing-arrows.gif" alt="loading">');
             $("#reportTable tbody").html("");
             let index = 0;
             function next() {
@@ -167,17 +182,17 @@
             closeEmailPopup();
         }
 
+
+
         function rerunTests() { runTests(); }
+        function openEmailPopup() { $("#emailPopup").show(); }
+        function closeEmailPopup() { $("#emailPopup").hide(); }
         function updateTable() {
             let tbody = results.map(test => `<tr><td>${test.no}</td><td>${test.name}</td><td>${test.description}</td><td class="${test.status.toLowerCase()}">${test.status}</td></tr>`).join("");
             $("#reportTable tbody").html(tbody);
         }
-        function openEmailPopup() { $("#emailPopup").show(); }
-        function closeEmailPopup() { $("#emailPopup").hide(); }
         $(document).ready(runTests);
     </script>
 </body>
 </html>
-
-
 
