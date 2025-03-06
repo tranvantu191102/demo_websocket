@@ -4,105 +4,13 @@
     <title>Automated Test Runner</title>
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f2f5;
-            padding: 40px;
-            text-align: center;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .status {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-        }
-        .running {
-            background-color: #fff4c4;
-            color: #d49a00;
-        }
-        .running img {
-            width: 22px;
-            height: 22px;
-            margin-left: 10px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        .passed { background-color: #d4edda; color: #155724; }
-        .failed { background-color: #f8d7da; color: #721c24; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: center;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        .button {
-            margin: 15px 5px;
-            padding: 12px 18px;
-            background-color: #28a745;
-            color: white;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .button:hover { background-color: #218838; }
-        .button:disabled {
-            background-color: grey;
-            cursor: not-allowed;
-        }
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            width: 350px;
-        }
-        .popup input {
-            padding: 10px;
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            margin-bottom: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="./style/index.css">
 </head>
 <body>
     <div class="container">
         <h2>Automated Test Runner</h2>
         <div id="test-status" class="status running">Running tests...
-            <img src="Chasing-arrows.gif" alt="loading">
+            <img src="./img/Chasing-arrows.gif" alt="loading">
         </div>
         <button class="button" id="rerunButton" onclick="rerunTests()" disabled>Re-run Tests</button>
         <button class="button" id="sendReportButton" onclick="openEmailPopup()" disabled>Send Report</button>
@@ -129,82 +37,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://smtpjs.com/v3/smtp.js"></script>
-    <script>
-        let testCases = [
-            { name: "Test Case 1", description: "Checks WebSocket wss:// support", run: runTestCase1 },
-            { name: "Test Case 2", description: "Checks WebSocket ws:// support", run: runTestCase2 }
-        ];
-        let results = [];
-        function runTestCase1() {
-            return new Promise(resolve => {
-                let ws = new WebSocket('wss://echo.websocket.org');
-                let timeout = setTimeout(() => { ws.close(); resolve("Failed"); }, 10000);
-                ws.onopen = () => { clearTimeout(timeout); ws.close(); resolve("Passed"); };
-                ws.onerror = () => { clearTimeout(timeout); resolve("Failed"); };
-            });
-        }
-        function runTestCase2() {
-            return new Promise(resolve => {
-                let ws = new WebSocket('ws://echo.websocket.org');
-                let timeout = setTimeout(() => { ws.close(); resolve("Failed"); }, 10000);
-                ws.onopen = () => { clearTimeout(timeout); ws.close(); resolve("Passed"); };
-                ws.onerror = () => { clearTimeout(timeout); resolve("Failed"); };
-            });
-        }
-        function runTests() {
-            results = [];
-            $("#test-status").removeClass().addClass("status running").html('Running tests...<img src="Chasing-arrows.gif" alt="loading">');
-            $("#reportTable tbody").html("");
-            let index = 0;
-            function next() {
-                if (index < testCases.length) {
-                    // window.prompt("Running Test Case : ", testCases[index].name, '  Index:', index);
-                    let test = testCases[index];
-                    test.run().then(status => {
-                        // window.prompt("Test Case : ", test.name, status);
-                        results.push({ no: index + 1, name: test.name, description: test.description, status });
-                        updateTable();
-                        index++;
-                        next();
-                    }).catch(error => {
-                        results.push({ no: index + 1, name: test.name, description: test.description, status: 'Failed' });
-                        updateTable();
-                        index++;
-                        next();
-                    });
-                } else {
-                    $("#test-status").removeClass("running").addClass("passed").text("All tests completed");
-                    document.getElementById("rerunButton").disabled = false;
-                    document.getElementById("sendReportButton").disabled = false;
-                }
-            }
-            next();
-        }
-
-        function sendReport() {
-            let email = $("#receiverEmail").val();
-            let report = results.map(r => `${r.no}. ${r.name} - ${r.description} - ${r.status}`).join("\n");
-            Email.send({
-                SecureToken: "your-smtp-token-here",
-                To: email,
-                From: "your-email@example.com",
-                Subject: "Test Report",
-                Body: `Test Results:\n\n${report}`
-            }).then(message => alert("Report Sent Successfully"));
-            closeEmailPopup();
-        }
-
-
-
-        function rerunTests() { runTests(); }
-        function openEmailPopup() { $("#emailPopup").show(); }
-        function closeEmailPopup() { $("#emailPopup").hide(); }
-        function updateTable() {
-            let tbody = results.map(test => `<tr><td>${test.no}</td><td>${test.name}</td><td>${test.description}</td><td class="${test.status.toLowerCase()}">${test.status}</td></tr>`).join("");
-            $("#reportTable tbody").html(tbody);
-        }
-        $(document).ready(runTests);
-    </script>
+    <script src="./script/index.js"></script>
 </body>
 </html>
 
