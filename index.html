@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Automated Test Runner</title>
+
+    <link rel="stylesheet" href="./libs/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="./style/index.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Automated Test Runner</h2>
+        <div id="test-status" class="status running">Running tests...
+            <img src="./img/Chasing-arrows.gif" alt="loading">
+        </div>
+        <button class="button" id="rerunButton" onclick="rerunTests()" disabled>Re-run Tests</button>
+        <button class="button" id="sendReportButton" onclick="openEmailPopup()" disabled>Send Report</button>
+        <table id="reportTable">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th class="test-case-col">Test Case Name</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div id="emailPopup" class="popup">
+        <h3>Enter Receiver Email</h3>
+        <input type="email" id="receiverEmail" placeholder="Enter email">
+        <button class="button" onclick="sendReport()">Send</button>
+        <button class="button" onclick="closeEmailPopup()">Cancel</button>
+    </div>
+
+
+    <script src="./libs/jquery-3.6.0.min.js"></script>
+    <script src="./libs/jquery.dataTables.min.js"></script>
+    <!-- <script src="https://smtpjs.com/v3/smtp.js"></script> -->
+    <script src="./script/index.js"></script>
+</body>
+</html>
+

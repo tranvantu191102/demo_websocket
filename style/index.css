@@ -1,0 +1,115 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f0f2f5;
+    padding: 40px;
+    text-align: center;
+}
+.container {
+    max-width: 1000px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+.status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+.test-case-col {
+    width: 100px;
+}
+.running {
+    background-color: #fff4c4;
+    color: #d49a00;
+}
+.running img {
+    width: 22px;
+    height: 22px;
+    margin-left: 10px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.passed { background-color: #d4edda; color: #155724; }
+.failed { background-color: #f8d7da; color: #721c24; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+th {
+    background-color: #007bff;
+    color: white;
+}
+.button {
+    margin: 15px 5px;
+    padding: 12px 18px;
+    background-color: #28a745;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.button:hover { background-color: #218838; }
+.button:disabled {
+    background-color: grey;
+    cursor: not-allowed;
+}
+
+.time-cell {
+
+}
+
+.time-cell-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+.time-cell-item-title {
+    text-wrap: nowrap;
+    font-size: 12px;
+    font-weight: 700;
+}
+.time-cell-item-value {
+    font-size: 12px;
+    font-weight: 400;
+    margin-left: 5px;
+
+}
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 350px;
+}
+.popup input {
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
