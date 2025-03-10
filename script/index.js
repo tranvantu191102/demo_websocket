@@ -80,12 +80,12 @@ function runTestCase3(){
                        <div>
                         <div>
                             <div>[Performance Time]: </div>
-                            <div>${performance_time}</div>
+                            <div>${Math.floor(performance_time)}</div>
                         </div>
 
                         <div>
                             <div>[Event timestamp]: </div>
-                            <div>${event.timeStamp}</div>
+                            <div>${Math.floor(event.timeStamp)}</div>
                         </div>
                        </div>
                     `
@@ -103,6 +103,8 @@ function runTests() {
     results = [];
     $("#test-status").removeClass().addClass("status running").html('Running tests...<img src="./img/Chasing-arrows.gif" alt="loading">');
     $("#reportTable tbody").html("");
+    document.getElementById("rerunButton").disabled = true;
+    document.getElementById("sendReportButton").disabled = true;
     let index = 0;
     function next() {
         if (index < testCases.length) {
