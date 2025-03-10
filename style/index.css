@@ -5,7 +5,7 @@ body {
     text-align: center;
 }
 .container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: auto;
     background: white;
     padding: 30px;
@@ -23,6 +23,9 @@ h2 {
     padding: 12px;
     border-radius: 8px;
     font-weight: bold;
+}
+.test-case-col {
+    width: 100px;
 }
 .running {
     background-color: #fff4c4;
@@ -69,6 +72,27 @@ th {
 .button:disabled {
     background-color: grey;
     cursor: not-allowed;
+}
+
+.time-cell {
+
+}
+
+.time-cell-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+.time-cell-item-title {
+    text-wrap: nowrap;
+    font-size: 12px;
+    font-weight: 700;
+}
+.time-cell-item-value {
+    font-size: 12px;
+    font-weight: 400;
+    margin-left: 5px;
+
 }
 .popup {
     display: none;

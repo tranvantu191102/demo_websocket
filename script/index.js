@@ -1,25 +1,43 @@
 let testCases = [
-    { name: "Test Case 1", description: "Checks WebSocket wss:// support", run: runTestCase1 },
-    { name: "Test Case 2", description: "Checks WebSocket ws:// support", run: runTestCase2 },
-    { name: "Test Case 3", description: "Checks click event not working", run: runTestCase3 }
+    { name: "Test Case 1", description: "Checks WebSocket wss:// support", run: runTestCase1, note: '-' },
+    { name: "Test Case 2", description: "Checks WebSocket ws:// support", run: runTestCase2, note: '-' },
+    { name: "Test Case 3", description: "This test case verifies that the event timestamp (event_time) of a button click is greater than the recorded performance time (performance_time) when the event listener is triggered.", run: runTestCase3, note: '' }
 ];
 let results = [];
 
 function runTestCase1() {
     return new Promise(resolve => {
         let ws = new WebSocket('wss://echo.websocket.org');
-        let timeout = setTimeout(() => { ws.close(); resolve("Failed"); }, 10000);
-        ws.onopen = () => { clearTimeout(timeout); ws.close(); resolve("Passed"); };
-        ws.onerror = () => { clearTimeout(timeout); resolve("Failed"); };
+        let timeout = setTimeout(() => { ws.close(); resolve({
+            status: "Failed",
+            note: ""
+        }); }, 10000);
+        ws.onopen = () => { clearTimeout(timeout); ws.close(); resolve({
+            status: "Passed",
+            note: ""
+        }); };
+        ws.onerror = () => { clearTimeout(timeout); resolve({
+            status: "Failed",
+            note: ""
+        }); };
     });
 }
 
 function runTestCase2() {
     return new Promise(resolve => {
         let ws = new WebSocket('ws://echo.websocket.org');
-        let timeout = setTimeout(() => { ws.close(); resolve("Failed"); }, 10000);
-        ws.onopen = () => { clearTimeout(timeout); ws.close(); resolve("Passed"); };
-        ws.onerror = () => { clearTimeout(timeout); resolve("Failed"); };
+        let timeout = setTimeout(() => { ws.close(); resolve({
+            status: "Failed",
+            note: ""
+        }); }, 10000);
+        ws.onopen = () => { clearTimeout(timeout); ws.close(); resolve({
+            status: "Passed",
+            note: ""
+        }); };
+        ws.onerror = () => { clearTimeout(timeout); resolve({
+            status: "Failed",
+            note: ""
+        }); };
     });
 }
 
@@ -39,9 +57,39 @@ function runTestCase3(){
             console.log("[Test Case 3] event timestamp : ", event.timeStamp);
 
             if(performance_time < event.timeStamp){
-                resolve("Passed");
+                resolve({
+                    status: "Passed",
+                    note: `
+                       <div class="time-cell">
+                        <div class="time-cell-item">
+                            <div class="time-cell-item-title">[Performance Time]: </div>
+                            <div class="time-cell-item-value">${Math.floor(performance_time)}</div>
+                        </div>
+
+                        <div class="time-cell-item">
+                            <div class="time-cell-item-title">[Event timestamp]: </div>
+                            <div class="time-cell-item-value">${Math.floor(event.timeStamp)}</div>
+                        </div>
+                       </div>
+                    `
+                });
             } else {
-                resolve("Failed");
+                resolve({
+                    status: "Failed",
+                    note: `
+                       <div>
+                        <div>
+                            <div>[Performance Time]: </div>
+                            <div>${performance_time}</div>
+                        </div>
+
+                        <div>
+                            <div>[Event timestamp]: </div>
+                            <div>${event.timeStamp}</div>
+                        </div>
+                       </div>
+                    `
+                });
             }
         })
 
@@ -60,14 +108,14 @@ function runTests() {
         if (index < testCases.length) {
             // window.prompt("Running Test Case : ", testCases[index].name, '  Index:', index);
             let test = testCases[index];
-            test.run().then(status => {
+            test.run().then(res => {
                 // window.prompt("Test Case : ", test.name, status);
-                results.push({ no: index + 1, name: test.name, description: test.description, status });
+                results.push({ no: index + 1, name: test.name, description: test.description,status: res.status, note: res.note });
                 updateTable();
                 index++;
                 next();
             }).catch(error => {
-                results.push({ no: index + 1, name: test.name, description: test.description, status: 'Failed' });
+                results.push({ no: index + 1, name: test.name, description: test.description,status: 'Failed', note: res.note  });
                 updateTable();
                 index++;
                 next();
@@ -100,7 +148,7 @@ function rerunTests() { runTests(); }
 function openEmailPopup() { $("#emailPopup").show(); }
 function closeEmailPopup() { $("#emailPopup").hide(); }
 function updateTable() {
-    let tbody = results.map(test => `<tr><td>${test.no}</td><td>${test.name}</td><td>${test.description}</td><td class="${test.status.toLowerCase()}">${test.status}</td></tr>`).join("");
+    let tbody = results.map(test => `<tr><td>${test.no}</td><td>${test.name}</td><td>${test.description}</td><td class="${test.status.toLowerCase()}">${test.status}</td><td>${test.note}</td></tr>`).join("");
     $("#reportTable tbody").html(tbody);
 }
 $(document).ready(runTests);
