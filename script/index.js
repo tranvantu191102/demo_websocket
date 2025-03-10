@@ -82,15 +82,15 @@ function runTests() {
 }
 
 function sendReport() {
-    let email = $("#receiverEmail").val();
-    let report = results.map(r => `${r.no}. ${r.name} - ${r.description} - ${r.status}`).join("\n");
-    Email.send({
-        SecureToken: "your-smtp-token-here",
-        To: email,
-        From: "your-email@example.com",
-        Subject: "Test Report",
-        Body: `Test Results:\n\n${report}`
-    }).then(message => alert("Report Sent Successfully"));
+    // let email = $("#receiverEmail").val();
+    // let report = results.map(r => `${r.no}. ${r.name} - ${r.description} - ${r.status}`).join("\n");
+    // Email.send({
+    //     SecureToken: "your-smtp-token-here",
+    //     To: email,
+    //     From: "your-email@example.com",
+    //     Subject: "Test Report",
+    //     Body: `Test Results:\n\n${report}`
+    // }).then(message => alert("Report Sent Successfully"));
     closeEmailPopup();
 }
 
