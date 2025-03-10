@@ -1,6 +1,7 @@
 let testCases = [
     { name: "Test Case 1", description: "Checks WebSocket wss:// support", run: runTestCase1 },
-    { name: "Test Case 2", description: "Checks WebSocket ws:// support", run: runTestCase2 }
+    { name: "Test Case 2", description: "Checks WebSocket ws:// support", run: runTestCase2 },
+    { name: "Test Case 3", description: "Checks click event not working", run: runTestCase3 }
 ];
 let results = [];
 
@@ -19,6 +20,34 @@ function runTestCase2() {
         let timeout = setTimeout(() => { ws.close(); resolve("Failed"); }, 10000);
         ws.onopen = () => { clearTimeout(timeout); ws.close(); resolve("Passed"); };
         ws.onerror = () => { clearTimeout(timeout); resolve("Failed"); };
+    });
+}
+
+function runTestCase3(){
+    let timeOut = null
+    return new Promise(resolve => {
+        if(timeOut) {
+            clearTimeout(timeOut);
+        }
+        let button = document.createElement("button");
+        const performance_time = window.performance.now();
+        console.log("[Test Case 3] performance_time : ", performance_time);
+
+
+
+        button.addEventListener("click", (event) => {
+            console.log("[Test Case 3] event timestamp : ", event.timeStamp);
+
+            if(performance_time < event.timeStamp){
+                resolve("Passed");
+            } else {
+                resolve("Failed");
+            }
+        })
+
+        timeOut = setTimeout(() => {
+                button.click();
+        }, 500);
     });
 }
 
@@ -75,3 +104,4 @@ function updateTable() {
     $("#reportTable tbody").html(tbody);
 }
 $(document).ready(runTests);
+
