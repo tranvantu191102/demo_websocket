@@ -115,7 +115,7 @@ function runTests() {
                 index++;
                 next();
             }).catch(error => {
-                results.push({ no: index + 1, name: test.name, description: test.description,status: 'Failed', note: res.note  });
+                results.push({ no: index + 1, name: test.name, description: test.description,status: 'Failed', note: test.note  });
                 updateTable();
                 index++;
                 next();
