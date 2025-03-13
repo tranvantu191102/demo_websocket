@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Automated Test Runner</title>
 
     <link rel="stylesheet" href="./libs/jquery.dataTables.min.css">
     <link rel="stylesheet" href="./style/index.css">
 </head>
+
 <body>
     <div class="container">
         <h2>Automated Test Runner</h2>
         <div id="test-status" class="status running">Running tests...
-            <img src="./img/Chasing-arrows.gif" alt="loading">
+            <span class="loader"></span>
         </div>
-        <button class="button" id="rerunButton" onclick="rerunTests()" disabled>Re-run Tests</button>
-        <button class="button" id="sendReportButton" onclick="openEmailPopup()" disabled>Send Report</button>
+        <button class="button" id="rerunButton" disabled>Re-run Tests</button>
+        <button class="button" id="sendReportButton" disabled>Send Report</button>
         <table id="reportTable">
             <thead>
                 <tr>
@@ -26,19 +28,62 @@
             </thead>
             <tbody></tbody>
         </table>
+
+        <div class="report-status success">
+            <div class="report-status-text">
+                The report was sent successfully
+            </div>
+        </div>
+
+        <div class="report-status error">
+            <div class="report-status-text">
+                The report failed to send
+            </div>
+        </div>
     </div>
+
+
+    <div id="fullscreen-popup">
+        <!-- <span class="close-btn">&times;</span> -->
+        <div id="canvas-container">
+            <h1>Test Case 4</h1>
+            <div class="test-case-4-imgs">
+
+                <div class="tc-4-image">
+                    <div class="tc-4-image-title">Draw on the browser</div>
+                    <canvas width="300" height="300" id="my_Canvas"></canvas>
+                </div>
+                <div class="tc-4-loading">
+                    <div  class="tc-4-loading-text">
+                        Comparing...
+                    </div>
+                    <div class="tc-4-loading-loader"></div>
+                </div>
+                <div class="tc-4-image">
+                    <div class="tc-4-image-title">Orginal image</div>
+                    <img src="./resources/webgl-sample-on-bench.png" alt="" id="webgl-sample" width="300" height="300">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <div id="emailPopup" class="popup">
         <h3>Enter Receiver Email</h3>
         <input type="email" id="receiverEmail" placeholder="Enter email">
-        <button class="button" onclick="sendReport()">Send</button>
-        <button class="button" onclick="closeEmailPopup()">Cancel</button>
+        <button class="send-report-btn">Send</button>
+        <button class="cancel-report-btn">Cancel</button>
     </div>
 
 
     <script src="./libs/jquery-3.6.0.min.js"></script>
     <script src="./libs/jquery.dataTables.min.js"></script>
     <!-- <script src="https://smtpjs.com/v3/smtp.js"></script> -->
-    <script src="./script/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
+    <script type="module">
+        import { runTests } from './script/index.js';
+        // runTests();
+    </script>
 </body>
-</html>
 
+</html>

@@ -1,0 +1,1 @@
+export const ENCRYPT_PASSWORD = '123456767890';
