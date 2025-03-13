@@ -13,19 +13,10 @@ export function checkTimeStamp() {
 
             resolve({
                 status: performance_time < event.timeStamp ? "Passed" : "Failed",
-                note: `
-                    <div class="time-cell">
-                    <div class="time-cell-item-title">EXPECT(performancetime < event.timeStampe)</div>
-                    <div class="time-cell-item">
-                        <div class="time-cell-item-title">[Performance Time]: </div>
-                        <div class="time-cell-item-value">${Math.floor(performance_time)}</div>
-                    </div>
-                    <div class="time-cell-item">
-                        <div class="time-cell-item-title">[Event timestamp]: </div>
-                        <div class="time-cell-item-value">${Math.floor(event.timeStamp)}</div>
-                    </div>
-                    </div>
-                `
+                note: {
+                    performance_time: performance_time,
+                    event_time: event.timeStamp
+                }
             });
         });
 

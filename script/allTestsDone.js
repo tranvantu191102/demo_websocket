@@ -33,8 +33,12 @@ function connectWebSocket(socket, reportData) {
 
     socket.onclose = () => {
         console.log("The socket is closed");
-        $(".report-status.error").addClass("show");
     };
+
+    socket.onerror = (error) => {
+        console.log("The error: ",error);
+        $(".report-status.error").addClass("show");
+    }
 }
 
 function sendMessage(socket, msg) {

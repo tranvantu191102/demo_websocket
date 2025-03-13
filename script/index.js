@@ -84,8 +84,27 @@ export function rerunTests() {
 export function openEmailPopup() { $("#emailPopup").show(); }
 export function closeEmailPopup() { $("#emailPopup").hide(); }
 function updateTable() {
-    let tbody = results.map(test => `<tr><td>${test.no}</td><td>${test.name}</td><td>${test.description}</td><td class="${test.status.toLowerCase()}">${test.status}</td><td>${test.note}</td></tr>`).join("");
+    let tbody = results.map(test => `<tr><td>${test.no}</td><td>${test.name}</td><td>${test.description}</td><td class="${test.status.toLowerCase()}">${test.status}</td><td>${generateNoteUI(test)}</td></tr>`).join("");
     $("#reportTable tbody").html(tbody);
+}
+
+function generateNoteUI(test) {
+    switch (test.name) {
+        case "Test case 2":
+            return `<div class="time-cell">
+                    <div class="time-cell-item-title">EXPECT(performancetime < event.timeStampe)</div>
+                    <div class="time-cell-item">
+                        <div class="time-cell-item-title">[Performance Time]: </div>
+                        <div class="time-cell-item-value">${Math.floor(test.note.performance_time)}</div>
+                    </div>
+                    <div class="time-cell-item">
+                        <div class="time-cell-item-title">[Event timestamp]: </div>
+                        <div class="time-cell-item-value">${Math.floor(test.note.event_time)}</div>
+                    </div>
+                    </div>`;
+        default:
+            return test.note;
+    }
 }
 
 $(document).ready(function () {
